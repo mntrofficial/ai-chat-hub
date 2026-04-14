@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat Hub</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1e1e2f;
+      color: #fff;
+      overflow: hidden;
+      height: 100vh;
+    }
+    .app-container { display: flex; height: 100%; }
+    .sidebar {
+      width: 280px;
+      background: #2a2a3b;
+      border-right: 1px solid #3a3a4e;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 12px;
+      gap: 20px;
+      overflow-y: auto;
+      flex-shrink: 0;
+      transition: width 0.3s ease;
+    }
+    .sidebar.collapsed {
+      width: 80px;
+      padding: 20px 8px;
+    }
+    .sidebar.collapsed .logo span:not(.menu-icon),
+    .sidebar.collapsed .service-btn .service-name,
+    .sidebar.collapsed .search-section,
+    .sidebar.collapsed .info-note {
+      display: none;
+    }
+    .sidebar.collapsed .service-btn {
+      justify-content: center;
+      padding: 12px 0;
+    }
+    .sidebar.collapsed .service-icon {
+      font-size: 1.6rem;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #3a3a4e;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .menu-icon {
+      cursor: pointer;
+      font-size: 1.4rem;
+      background: none;
+      border: none;
+      color: white;
+      padding: 5px;
+    }
+    .service-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .service-btn {
+      background: #3a3a4e;
+      border: none;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      text-align: left;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .service-btn:hover { background: #4a4a62; transform: translateX(4px); }
+    .service-btn.active { background: #5a6acf; box-shadow: 0 2px 8px rgba(90,106,207,0.3); }
+    .search-section {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #3a3a4e;
+    }
+    .search-box { display: flex; gap: 8px; margin-bottom: 10px; }
+    .search-input {
+      flex: 1;
+      padding: 8px 12px;
+      background: #3a3a4e;
+      border: 1px solid #5a5a72;
+      border-radius: 20px;
+      color: white;
+      outline: none;
+    }
+    .search-input:focus { border-color: #5a6acf; }
+    .search-btn, .nav-btn {
+      background: #5a6acf;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .search-nav { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+    .info-note {
+      font-size: 0.7rem;
+      color: #aaa;
+      text-align: center;
+      margin-top: 10px;
+      padding: 8px;
+      background: #2a2a3b;
+      border-radius: 8px;
+    }
+    .viewer { flex: 1; position: relative; background: #fff; }
+    webview { width: 100%; height: 100%; display: inline-flex; }
+    .error-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      color: white;
+    }
+    .error-overlay.hidden { display: none; }
+    .error-overlay button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #5a6acf;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="sidebar" id="sidebar">
+    <div class="logo">
+      <span>🤖 AI Chat Hub</span>
+      <button class="menu-icon" id="toggleSidebarBtn">☰</button>
+    </div>
+    <div class="service-list">
+      <button class="service-btn active" data-url="https://chat.deepseek.com/" data-service="deepseek">
+        <span class="service-icon">🧠</span>
+        <span class="service-name">DeepSeek</span>
+      </button>
+      <button class="service-btn" data-url="https://alice.yandex.ru/" data-service="alice">
+        <span class="service-icon">🔵</span>
+        <span class="service-name">AliceAI</span>
+      </button>
+      <button class="service-btn" data-url="https://duck.ai/" data-service="duck">
+        <span class="service-icon">🦆</span>
+        <span class="service-name">Duck AI</span>
+      </button>
+      <button class="service-btn" data-url="https://giga.chat/" data-service="giga">
+        <span class="service-icon">💜</span>
+        <span class="service-name">GigaChat</span>
+      </button>
+      <button class="service-btn" data-url="https://chat.qwen.ai/" data-service="qwen">
+        <span class="service-icon">🐉</span>
+        <span class="service-name">Qwen AI</span>
+      </button>
+    </div>
+
+    <div class="search-section">
+      <div class="search-box">
+        <input type="text" id="searchInput" class="search-input" placeholder="Поиск на странице...">
+        <button id="searchBtn" class="search-btn">🔍</button>
+      </div>
+      <div class="search-nav">
+        <button id="prevMatchBtn" class="nav-btn">◀</button>
+        <button id="nextMatchBtn" class="nav-btn">▶</button>
+      </div>
+    </div>
+
+    <div class="info-note">
+      ✅ Вход через email/пароль — работает прямо в окне приложения.<br>
+      🔍 Поиск работает для всех сервисов.
+    </div>
+  </div>
+
+  <div class="viewer">
+    <webview id="mainWebview" src="https://chat.deepseek.com/" partition="persist:default" allowpopups></webview>
+    <div id="errorOverlay" class="error-overlay hidden">
+      <div>⚠️ Ошибка загрузки страницы</div>
+      <button id="reloadBtn">Перезагрузить</button>
+    </div>
+  </div>
+</div>
+<script src="renderer.js"></script>
+</body>
+</html>
