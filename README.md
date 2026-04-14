@@ -18,6 +18,6 @@
 
 ## Установка
 
-1. Скачайте установщик `AI Chat Hub Setup 1.0.0.exe` из раздела [Releases](https://github.com/MNTR/ai-chat-hub/releases).
+1. Скачайте установщик `AI Chat Hub Setup 1.0.0.exe` из раздела [Releases](https://github.com/mntrofficial/ai-chat-hub/releases).
 2. Запустите установку и следуйте инструкциям.
 3. После установки запустите приложение через ярлык на рабочем столе или в меню «Пуск».
