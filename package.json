@@ -1,0 +1,56 @@
+{
+  "name": "ai-chat-hub",
+  "version": "2.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": ["ai", "chat", "deepseek", "alice", "duck", "gigachat", "qwen"],
+  "author": "MNTR",
+  "license": "MIT",
+  "description": "Мульти-чат клиент для AI ассистентов: DeepSeek, Alice, Duck, GigaChat, Qwen. Поддержка поиска и сворачиваемая боковая панель.",
+  "devDependencies": {
+    "electron": "^34.0.1",
+    "electron-builder": "^25.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mentura1993/ai-chat-hub.git"
+  },
+  "build": {
+    "appId": "com.mntr.aichathub",
+    "productName": "AI Chat Hub",
+    "copyright": "Copyright © 2026 MNTR",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "renderer.js",
+      "chat-ai-logo.png"
+    ],
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "chat-ai-logo.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "chat-ai-logo.png"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "chat-ai-logo.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AI Chat Hub"
+    },
+    "forceCodeSigning": false
+  }
+}
